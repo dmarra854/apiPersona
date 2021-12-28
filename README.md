@@ -2,7 +2,6 @@
 Challenge Banco Hipotecario
 
  ### Documentación (Swagger)
-___
 http://localhost:8080/swagger-ui.html
 
 

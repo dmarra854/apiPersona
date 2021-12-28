@@ -5,6 +5,6 @@ Challenge Banco Hipotecario
 http://localhost:8080/swagger-ui.html
 
 
-Author - Dario Marranti
-Email - dario.marranti@gmail.com
+* Author - Dario Marranti
+* Email - dario.marranti@gmail.com
 

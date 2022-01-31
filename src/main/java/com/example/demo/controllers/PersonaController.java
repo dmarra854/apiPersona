@@ -8,6 +8,7 @@ import com.example.demo.services.PersonaService;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
+import io.swagger.annotations.Api;
 import org.apache.commons.lang3.StringUtils;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,7 @@ import org.springframework.http.ResponseEntity;
 
 @RestController
 @RequestMapping("/persona")
+@Api(tags = {"Personas"})
 public class PersonaController {
 
     @Autowired

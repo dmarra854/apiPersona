@@ -1,6 +1,6 @@
 # apiPersona
 [![Java](https://img.shields.io/badge/JAVA-4479A1?style=for-the-badge&logo=JAVA&logoColor=white&labelColor=101010)]()
-[![Springboot](https://img.shields.io/badge/Springboot-339933?style=for-the-badge&logo=springbootg&logoColor=white&labelColor=101010)]()
+[![Springboot](https://img.shields.io/badge/springboot-339933?style=for-the-badge&logo=springboot&logoColor=white&labelColor=101010)]()]()
 [![Api](https://img.shields.io/badge/API-3d85c6?style=for-the-badge&logo=API&logoColor=white&labelColor=101010)]()
 [![H2](https://img.shields.io/badge/h2-0f91f4?style=for-the-badge&logo=h2A&logoColor=white&labelColor=101010)]()
 [![H2](https://img.shields.io/badge/maven-0c343d?style=for-the-badge&logo=maven&logoColor=white&labelColor=101010)]()

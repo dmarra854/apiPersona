@@ -2,36 +2,34 @@ package com.example.demo.models;
 import javax.validation.constraints.NotBlank;
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import org.springframework.validation.annotation.Validated;
 @Entity
 @Table(name = "personas")
+@Data
 public class PersonaModel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Getter @Setter @Column(unique = true, nullable = false)
+    @Column(unique = true, nullable = false)
     private Long id;
 
+    @Column(length = 100, nullable = false)
     @NotBlank(message = "El nombre es obligatorio")
-    @NotEmpty(message = "El nombre es obligatorio")
-    @Getter @Setter
+    @NotNull(message="This field cannot be null")
     private String nombre;
 
+    @Column(length = 100, nullable = false)
     @NotBlank(message = "El apellido es obligatorio")
-    @NotEmpty(message ="El apellido es obligatorio")
-    @Getter @Setter
+    @NotNull(message="This field cannot be null")
     private String apellido;
 
-    @Column(unique = true, nullable = false)
-    @Getter @Setter
+    @Column(unique = true, length = 10, nullable = false )
+    @NotBlank(message = "El dni es obligatorio")
+    @NotNull(message="This field cannot be null")
     private String dni;
 
-    @Getter @Setter
     private boolean esEmpleado;
 }

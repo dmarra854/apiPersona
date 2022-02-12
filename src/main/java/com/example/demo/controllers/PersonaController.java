@@ -1,7 +1,10 @@
 package com.example.demo.controllers;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import com.example.demo.exceptions.BadRequestException;
+import com.example.demo.exceptions.NotFoundException;
 import com.example.demo.models.PersonaModel;
 import com.example.demo.services.PersonaService;
 
@@ -9,106 +12,106 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
 import io.swagger.annotations.Api;
-import org.apache.commons.lang3.StringUtils;
 
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.Errors;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @RestController
 @RequestMapping("/persona")
 @Api(tags = {"Personas"})
+
 public class PersonaController {
+
+    /** The Constant log. */
+    private static final Logger log = LoggerFactory.getLogger(PersonaController.class);
 
     @Autowired
     PersonaService personaService;
 
-    @GetMapping()
-    public ResponseEntity<List<PersonaModel>>obtenerPersonas() {
+    public PersonaController(PersonaService personaService) {
+        this.personaService = personaService;
+    }
 
+    @GetMapping()
+    public ResponseEntity<List<PersonaModel>> obtenerPersonas() {
         List<PersonaModel> personas = this.personaService.obtenerPersonas();
-        return new ResponseEntity<List<PersonaModel>>(personas, HttpStatus.OK);
+        if (personas.isEmpty() || personas.equals("[]"))
+            throw new NotFoundException("No se encontraron personas");
+        return new ResponseEntity<>(personas, HttpStatus.OK);
     }
 
     @PostMapping()
-    public ResponseEntity<?> guardarPersona(@RequestBody PersonaModel persona){
+    @ApiOperation(value = "Create new Persona", notes = "Create new Persona")
+    public ResponseEntity<?> guardarPersona( @Valid @RequestBody PersonaModel persona, Errors errors){
 
-        if(StringUtils.isBlank(persona.getNombre()))
-            return new ResponseEntity("El nombre es obligatorio", HttpStatus.BAD_REQUEST);
-
-        if(StringUtils.isBlank(persona.getApellido()))
-            return new ResponseEntity("El Apellido es obligatorio", HttpStatus.BAD_REQUEST);
-
-        if(StringUtils.isBlank(persona.getDni()))
-            return new ResponseEntity("El DNI es obligatorio", HttpStatus.BAD_REQUEST);
-
-        //Se comenta validación por asumir que puede haber una persona con el mismo nombre con distinto dni
-/*
-        if(personaService.existsByNombre (persona.getNombre()))
-            return new ResponseEntity("Ya existe una persona con ese nombre", HttpStatus.BAD_REQUEST);
-
-        if(personaService.existsByApellido(persona.getApellido()))
-            return new ResponseEntity("Ya existe una persona con ese Apellido", HttpStatus.BAD_REQUEST);
-*/
-
+        if(errors.hasErrors()) {
+            List<String> errorMsg = new ArrayList<String>();
+            errors.getAllErrors().forEach(a -> errorMsg.add(a.getDefaultMessage()));
+            return new ResponseEntity<List<String>>(errorMsg, HttpStatus.BAD_REQUEST);
+        }
         if(personaService.existsByDni(persona.getDni()))
-            return new ResponseEntity("Ya existe una persona con ese DNI ", HttpStatus.BAD_REQUEST);
+            throw new BadRequestException("Ya existe una persona con ese DNI");
 
         this.personaService.guardarPersona(persona);
-        return new ResponseEntity("Persona creada", HttpStatus.OK);
+        return new ResponseEntity("Persona creada", HttpStatus.CREATED); //HttpStatus.OK
     }
 
     @GetMapping(path = "/{id}")
-    public ResponseEntity<PersonaModel> obtenerPersonaPorId(@PathVariable("id") Long id){
+    public ResponseEntity<?> obtenerPersonaPorId(@PathVariable("id") Long id){
 
         if (!this.personaService.existsPersonaById(id))
-            return new ResponseEntity("No existe la persona con id "+ id, HttpStatus.NOT_FOUND);
+            throw new NotFoundException("No existe la persona con id "+ id);
 
-        PersonaModel persona = personaService.obtenerPersonaPorId(id).get();
-        return new ResponseEntity(persona, HttpStatus.OK);
+            PersonaModel persona = personaService.obtenerPersonaPorId(id).get();
+            if ( persona.equals("[]"))
+                return new ResponseEntity(null,  HttpStatus.NO_CONTENT);
+
+            return new ResponseEntity(persona, HttpStatus.OK);
     }
 
-   @DeleteMapping(path = "/{id}")
-    public ResponseEntity<?> eliminarPorId(@PathVariable("id") Long id){
+    @DeleteMapping(path = "/{id}")
+    public ResponseEntity<?> eliminarPorId(@PathVariable("id") Long id)  {
 
         if (!this.personaService.existsPersonaById(id))
-            return new ResponseEntity("No existe la persona con id "+ id, HttpStatus.NOT_FOUND);
+            throw new NotFoundException("No existe la persona con id "+ id);
 
         boolean ok = this.personaService.eliminarPersona(id);
 
-        if (ok) {
-            return new ResponseEntity("Persona eliminada", HttpStatus.OK);
-        } else {
-            return new ResponseEntity("No se eliminó persona con id " + id, HttpStatus.BAD_REQUEST);
-        }
+        if (!ok) throw new BadRequestException("No se eliminó persona con id " + id);
+
+        return new ResponseEntity("Persona eliminada", HttpStatus.OK);
+
     }
 
     @PutMapping(path = "/{id}")
-    public ResponseEntity<?> modificarPersona( @PathVariable("id") Long id, @Valid @NotNull @RequestBody PersonaModel persona) {
+    public ResponseEntity<?> modificarPersona( @PathVariable("id") Long id, @Valid @NotNull @RequestBody PersonaModel persona, Errors errors) {
+
+        if(errors.hasErrors()) {
+            List<String> errorMsg = new ArrayList<String>();
+            errors.getAllErrors().forEach(a -> errorMsg.add(a.getDefaultMessage()));
+            return new ResponseEntity<List<String>>(errorMsg, HttpStatus.BAD_REQUEST);
+        }
 
         if (!this.personaService.existsPersonaById(id))
-            return new ResponseEntity("No existe la persona con id "+ id, HttpStatus.NOT_FOUND);
-
-        if(StringUtils.isBlank(persona.getNombre()))
-            return new ResponseEntity("El nombre es obligatorio", HttpStatus.BAD_REQUEST);
-
-        if(StringUtils.isBlank(persona.getApellido()))
-            return new ResponseEntity("El Apellido es obligatorio", HttpStatus.BAD_REQUEST);
-
-        if(StringUtils.isBlank(persona.getDni()))
-            return new ResponseEntity("El DNI es obligatorio", HttpStatus.BAD_REQUEST);
+            throw new NotFoundException("No existe la persona con id "+ id);
 
         if(personaService.existsByDni(persona.getDni()) && !this.personaService.findByDni(persona.getDni()).get().getId().equals(id))
-            return new ResponseEntity("Ya existe otra persona con ese DNI ", HttpStatus.BAD_REQUEST);
+            throw new BadRequestException("Ya existe otra persona con ese DNI ");
 
         boolean ok =  this.personaService.modificarPersona(id, persona);
 
         if (ok) {
             return new ResponseEntity("Persona modificada", HttpStatus.OK);
         } else {
-            return new ResponseEntity("No se modificó persona con id " + id, HttpStatus.BAD_REQUEST);
+            throw new BadRequestException("No se modificó persona con id " + id);
         }
 
     }
@@ -117,19 +120,17 @@ public class PersonaController {
     public ResponseEntity<?>  modificarPersonaParcial(@PathVariable Long id, @PathVariable String dni) {
 
         if (!this.personaService.existsPersonaById(id))
-            return new ResponseEntity("No existe la persona con id " + id, HttpStatus.NOT_FOUND);
+            throw new NotFoundException("No existe la persona con id " + id);
 
         if(personaService.existsByDni(dni))
-            return new ResponseEntity("Ya existe una persona con ese DNI ", HttpStatus.BAD_REQUEST);
+            throw new BadRequestException("Ya existe una persona con ese DNI ");
 
         boolean ok = personaService.modificarPersonaParcial(id, dni);
 
         if (ok) {
             return new ResponseEntity("Persona modificada", HttpStatus.OK);
         } else {
-            return new ResponseEntity("No se modificó persona con id " + id, HttpStatus.BAD_REQUEST);
+            throw new BadRequestException("No se modificó persona con id " + id);
         }
     }
-
-
 }

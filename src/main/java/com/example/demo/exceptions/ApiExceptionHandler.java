@@ -1,5 +1,7 @@
 package com.example.demo.exceptions;
 
+import org.springframework.beans.TypeMismatchException;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -8,6 +10,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.server.MethodNotAllowedException;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -39,10 +42,4 @@ public class ApiExceptionHandler {
      public ResponseEntity<?> notFoundException(Exception e) {
           return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
      }
-
-     @ExceptionHandler(value = {InternalServerErrorException.class})
-     public ResponseEntity<?> internalServerErrorException(Exception e) {
-          return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-     }
-
 }

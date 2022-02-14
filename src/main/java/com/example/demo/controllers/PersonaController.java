@@ -16,7 +16,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.Errors;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -41,15 +40,18 @@ public class PersonaController {
     }
 
     @GetMapping()
+    @ApiOperation(
+            value = "Returns a list of Persons",
+            notes = "Return a list of all Persons")
     public ResponseEntity<List<PersonaModel>> obtenerPersonas() {
         List<PersonaModel> personas = this.personaService.obtenerPersonas();
-        if (personas.isEmpty() || personas.equals("[]"))
+        if (personas.isEmpty())
             throw new NotFoundException("No se encontraron personas");
         return new ResponseEntity<>(personas, HttpStatus.OK);
     }
 
     @PostMapping()
-    @ApiOperation(value = "Create new Persona", notes = "Create new Persona")
+    @ApiOperation(value = "Creates a new Person", notes = "Create new Person")
     public ResponseEntity<?> guardarPersona( @Valid @RequestBody PersonaModel persona, Errors errors){
 
         if(errors.hasErrors()) {
@@ -65,19 +67,25 @@ public class PersonaController {
     }
 
     @GetMapping(path = "/{id}")
+    @ApiOperation(
+            value = "Returns the person corresponding to the id",
+            notes = "Returns HTTP 404 if the person is not found")
     public ResponseEntity<?> obtenerPersonaPorId(@PathVariable("id") Long id){
 
         if (!this.personaService.existsPersonaById(id))
             throw new NotFoundException("No existe la persona con id "+ id);
 
             PersonaModel persona = personaService.obtenerPersonaPorId(id).get();
-            if ( persona.equals("[]"))
-                return new ResponseEntity(null,  HttpStatus.NO_CONTENT);
+            if (persona.equals("[]"))
+                return new ResponseEntity(null, HttpStatus.NO_CONTENT);
 
             return new ResponseEntity(persona, HttpStatus.OK);
-    }
 
+    }
     @DeleteMapping(path = "/{id}")
+    @ApiOperation(
+            value = "Deletes the person corresponding to the id",
+            notes = "Returns HTTP 404 if the person is not found")
     public ResponseEntity<?> eliminarPorId(@PathVariable("id") Long id)  {
 
         if (!this.personaService.existsPersonaById(id))
@@ -92,6 +100,9 @@ public class PersonaController {
     }
 
     @PutMapping(path = "/{id}")
+    @ApiOperation(
+            value = "Modifies the person corresponding to the id",
+            notes = "Returns HTTP 404 if the person is not found")
     public ResponseEntity<?> modificarPersona( @PathVariable("id") Long id, @Valid @NotNull @RequestBody PersonaModel persona, Errors errors) {
 
         if(errors.hasErrors()) {
@@ -117,6 +128,9 @@ public class PersonaController {
     }
 
     @PatchMapping("/{id}/{dni}")
+    @ApiOperation(
+            value = "Modifies the document number  corresponding to the person id",
+            notes = "Returns HTTP 404 if the person is not found and HTTP 400 If a person already exists with the document number")
     public ResponseEntity<?>  modificarPersonaParcial(@PathVariable Long id, @PathVariable String dni) {
 
         if (!this.personaService.existsPersonaById(id))

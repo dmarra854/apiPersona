@@ -20,4 +20,6 @@ public interface PersonaRepository extends CrudRepository<PersonaModel, Long> {
     Optional<PersonaModel> findByDni(String dni);
 
     boolean existsByDni (String dni );
+
+
 }

@@ -82,6 +82,15 @@ public class PersonaController {
             return new ResponseEntity(persona, HttpStatus.OK);
 
     }
+/*
+    @DeleteMapping(value = "{patientId}")
+    public void deletePatientById(@PathVariable(value = "patientId") Long patientId) throws NotFoundException {
+        if (patientRecordRepository.findById(patientId).isEmpty()) {
+            throw new NotFoundException("Patient with ID " + patientId + " does not exist.");
+        }
+        patientRecordRepository.deleteById(patientId);
+    }
+    */
     @DeleteMapping(path = "/{id}")
     @ApiOperation(
             value = "Deletes the person corresponding to the id",

@@ -42,4 +42,5 @@ public class ApiExceptionHandler {
      public ResponseEntity<?> notFoundException(Exception e) {
           return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
      }
+
 }

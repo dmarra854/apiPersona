@@ -25,30 +25,30 @@ class PersonaServiceTest {
     private PersonaModel persona;
 
     @Test
-    void obtenerPersonas() {
+    void obtenerPersonasTest() {
 
         MockitoAnnotations.initMocks(this);
 
-		List<PersonaModel> list = new ArrayList<PersonaModel>();
+		List<PersonaModel> listaPersonas = new ArrayList<PersonaModel>();
 
 		PersonaModel personaUno = new PersonaModel(Long.valueOf(1), "John", "John", "9999999999", true);
 		PersonaModel personaDos = new PersonaModel(Long.valueOf(2), "Alex", "kolenchiski", "9999999999", true);
 		PersonaModel personaTres = new PersonaModel(Long.valueOf(3), "Steve", "Waugh", "9999999999", true);
 
-		list.add(personaUno);
-		list.add(personaUno);
-		list.add(personaUno);
+        listaPersonas.add(personaUno);
+        listaPersonas.add(personaDos);
+        listaPersonas.add(personaTres);
 
-		when(personaRepository.findAll()).thenReturn(list);
+		when(personaRepository.findAll()).thenReturn(listaPersonas);
 
         List<PersonaModel> empList = personaService.obtenerPersonas();
 
-		assertEquals(3, empList.size());
+		assertEquals(3, listaPersonas.size());
 
     }
 
     @Test
-    void guardarPersona() {
+    void guardarPersonaTest() {
         MockitoAnnotations.initMocks(this);
 
         persona = new PersonaModel();
@@ -63,7 +63,7 @@ class PersonaServiceTest {
     }
 
     @Test
-    void obtenerPersonaPorId() {
+    void obtenerPersonaPorIdTest() {
         MockitoAnnotations.initMocks(this);
 
         Long id = Long.valueOf(99);
@@ -85,37 +85,31 @@ class PersonaServiceTest {
         assertEquals(false, persona.get().isEsEmpleado());
 
     }
-/*
+
     @Test
-    void eliminarPersona() {
+    public void eliminarPersonaTest() {
+        MockitoAnnotations.initMocks(this);
+        persona = new PersonaModel();
+
+        persona.setId(Long.valueOf(99));
+        persona.setNombre("Lokesh");
+        persona.setApellido("Gupta");
+        persona.setDni("9999999999");
+        persona.setEsEmpleado(false);
+        personaRepository.save(persona);
+
+        personaRepository.deleteById(persona.getId());
+        Optional optional = personaRepository.findById(persona.getId());
+        assertEquals(Optional.empty(), optional);
     }
 
+/*
     @Test
     void modificarPersona() {
     }
 
     @Test
     void modificarPersonaParcial() {
-    }
-
-    @Test
-    void existsPersonaById() {
-    }
-
-    @Test
-    void existsByNombre() {
-    }
-
-    @Test
-    void existsByApellido() {
-    }
-
-    @Test
-    void existsByDni() {
-    }
-
-    @Test
-    void findByDni() {
     }
     */
 }

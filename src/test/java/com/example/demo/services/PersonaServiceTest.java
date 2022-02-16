@@ -28,7 +28,6 @@ class PersonaServiceTest {
     void obtenerPersonasTest() {
 
         MockitoAnnotations.initMocks(this);
-
 		List<PersonaModel> peopleList = new ArrayList<PersonaModel>();
 
 		PersonaModel personaUno = new PersonaModel(Long.valueOf(1), "John", "John", "9999999999", true);
@@ -43,14 +42,14 @@ class PersonaServiceTest {
 
         List<PersonaModel> persons = personaService.obtenerPersonas();
 
-		assertEquals(3, persons.size());
+		assertEquals(peopleList.size(), persons.size());
 
     }
 
     @Test
     void guardarPersonaTest() {
-        MockitoAnnotations.initMocks(this);
 
+        MockitoAnnotations.initMocks(this);
         PersonaModel persona = getPersona();
 
         when(personaRepository.save(any(PersonaModel.class))).thenReturn(persona);
@@ -59,10 +58,9 @@ class PersonaServiceTest {
 
     @Test
     void obtenerPersonaPorIdTest() {
+
         MockitoAnnotations.initMocks(this);
-
         Long id = Long.valueOf(99);
-
         PersonaModel persona = getPersona();
 
 		when(personaRepository.findById(id)).thenReturn(Optional.ofNullable(persona));
@@ -88,7 +86,14 @@ class PersonaServiceTest {
 
 /*
     @Test
-    void modificarPersonaParcial() {
+    public void modificarPersona() {
+
+        MockitoAnnotations.initMocks(this);
+        PersonaModel persona = getPersona();
+
+        when(personaRepository.findById(persona.getId())).thenReturn(Optional.ofNullable(persona));
+        boolean b = personaService.modificarPersona(persona.getId(), persona);
+        assertTrue(b);
     }
     */
 

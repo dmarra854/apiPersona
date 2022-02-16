@@ -13,7 +13,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 class PersonaServiceTest {
     @Mock
@@ -29,21 +29,21 @@ class PersonaServiceTest {
 
         MockitoAnnotations.initMocks(this);
 
-		List<PersonaModel> listaPersonas = new ArrayList<PersonaModel>();
+		List<PersonaModel> peopleList = new ArrayList<PersonaModel>();
 
 		PersonaModel personaUno = new PersonaModel(Long.valueOf(1), "John", "John", "9999999999", true);
 		PersonaModel personaDos = new PersonaModel(Long.valueOf(2), "Alex", "kolenchiski", "9999999999", true);
 		PersonaModel personaTres = new PersonaModel(Long.valueOf(3), "Steve", "Waugh", "9999999999", true);
 
-        listaPersonas.add(personaUno);
-        listaPersonas.add(personaDos);
-        listaPersonas.add(personaTres);
+        peopleList.add(personaUno);
+        peopleList.add(personaDos);
+        peopleList.add(personaTres);
 
-		when(personaRepository.findAll()).thenReturn(listaPersonas);
+		when(personaRepository.findAll()).thenReturn(peopleList);
 
-        List<PersonaModel> empList = personaService.obtenerPersonas();
+        List<PersonaModel> persons = personaService.obtenerPersonas();
 
-		assertEquals(3, listaPersonas.size());
+		assertEquals(3, persons.size());
 
     }
 
@@ -51,12 +51,7 @@ class PersonaServiceTest {
     void guardarPersonaTest() {
         MockitoAnnotations.initMocks(this);
 
-        persona = new PersonaModel();
-        persona.setId(Long.valueOf(99));
-        persona.setNombre("Edgardo");
-        persona.setApellido("Bauza");
-        persona.setDni("13082014");
-        persona.setEsEmpleado(true);
+        PersonaModel persona = getPersona();
 
         when(personaRepository.save(any(PersonaModel.class))).thenReturn(persona);
         assertNotNull(personaService.guardarPersona(new PersonaModel()));
@@ -68,35 +63,23 @@ class PersonaServiceTest {
 
         Long id = Long.valueOf(99);
 
-        persona = new PersonaModel();
-        persona.setId(Long.valueOf(99));
-        persona.setNombre("Lokesh");
-        persona.setApellido("Gupta");
-        persona.setDni("9999999999");
-        persona.setEsEmpleado(false);
+        PersonaModel persona = getPersona();
 
 		when(personaRepository.findById(id)).thenReturn(Optional.ofNullable(persona));
 
-		Optional<PersonaModel> persona = personaService.obtenerPersonaPorId(id);
+		Optional<PersonaModel> personaObtenida = personaService.obtenerPersonaPorId(id);
 
-		assertEquals("Lokesh", persona.get().getNombre());
-		assertEquals("Gupta", persona.get().getApellido());
-		assertEquals("9999999999", persona.get().getDni());
-        assertEquals(false, persona.get().isEsEmpleado());
+		assertEquals("Diego", personaObtenida.get().getNombre());
+		assertEquals("Simeone", personaObtenida.get().getApellido());
+		assertEquals("1414141414", personaObtenida.get().getDni());
+        assertEquals(false, personaObtenida.get().isEmployed());
 
     }
 
     @Test
     public void eliminarPersonaTest() {
         MockitoAnnotations.initMocks(this);
-        persona = new PersonaModel();
-
-        persona.setId(Long.valueOf(99));
-        persona.setNombre("Lokesh");
-        persona.setApellido("Gupta");
-        persona.setDni("9999999999");
-        persona.setEsEmpleado(false);
-        personaRepository.save(persona);
+        PersonaModel persona = getPersona();
 
         personaRepository.deleteById(persona.getId());
         Optional optional = personaRepository.findById(persona.getId());
@@ -105,11 +88,32 @@ class PersonaServiceTest {
 
 /*
     @Test
-    void modificarPersona() {
-    }
-
-    @Test
     void modificarPersonaParcial() {
     }
     */
+
+        @Test
+        public void modificarPersonaParcialTest() throws Exception {
+            MockitoAnnotations.initMocks(this);
+            String dni ="0000000014";
+            PersonaModel persona = getPersona();
+
+            when(personaRepository.findById(persona.getId())).thenReturn(Optional.ofNullable(persona));
+            boolean b = personaService.modificarPersonaParcial(persona.getId(), dni);
+            assertTrue(b);
+        }
+
+
+        private PersonaModel getPersona() {
+            persona = new PersonaModel();
+
+            persona.setId(Long.valueOf(14));
+            persona.setNombre("Diego");
+            persona.setApellido("Simeone");
+            persona.setDni("1414141414");
+            persona.setEmployed(false);
+            personaRepository.save(persona);
+
+            return persona;
+        }
 }

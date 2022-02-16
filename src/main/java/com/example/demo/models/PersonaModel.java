@@ -34,5 +34,5 @@ public class PersonaModel {
     @NotNull(message="This field cannot be null")
     private String dni;
 
-    private boolean esEmpleado;
+    private boolean isEmployed;
 }

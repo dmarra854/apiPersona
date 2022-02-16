@@ -46,7 +46,7 @@ public class PersonaService {
             persona.setNombre(personaModif.getNombre());
             persona.setApellido(personaModif.getApellido());
             persona.setDni(personaModif.getDni());
-            persona.setEsEmpleado(personaModif.isEsEmpleado());
+            persona.setEmployed(personaModif.isEmployed());
             personaRepository.save(persona);
             return true;
         } catch (Exception err) {

@@ -70,7 +70,7 @@ class PersonaServiceTest {
 		assertEquals("Diego", personaObtenida.get().getNombre());
 		assertEquals("Simeone", personaObtenida.get().getApellido());
 		assertEquals("1414141414", personaObtenida.get().getDni());
-        assertEquals(false, personaObtenida.get().isEmployed());
+        assertEquals(false, personaObtenida.get().isEsEmpleado());
 
     }
 
@@ -116,7 +116,7 @@ class PersonaServiceTest {
             persona.setNombre("Diego");
             persona.setApellido("Simeone");
             persona.setDni("1414141414");
-            persona.setEmployed(false);
+            persona.setEsEmpleado(false);
             personaRepository.save(persona);
 
             return persona;

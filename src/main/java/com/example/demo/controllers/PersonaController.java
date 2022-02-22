@@ -9,6 +9,7 @@ import com.example.demo.models.PersonaModel;
 import com.example.demo.services.PersonaService;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 import io.swagger.annotations.Api;
@@ -46,7 +47,7 @@ public class PersonaController {
     public ResponseEntity<List<PersonaModel>> obtenerPersonas() {
         List<PersonaModel> personas = this.personaService.obtenerPersonas();
         if (personas.isEmpty())
-            throw new NotFoundException("No se encontraron personas");
+            throw new NotFoundException("Not found persons");
         return new ResponseEntity<>(personas, HttpStatus.OK);
     }
 
@@ -60,7 +61,7 @@ public class PersonaController {
             return new ResponseEntity<List<String>>(errorMsg, HttpStatus.BAD_REQUEST);
         }
         if(personaService.existsByDni(persona.getDni()))
-            throw new BadRequestException("Ya existe una persona con ese DNI");
+            throw new BadRequestException("There is already a person with that DNI");
 
         this.personaService.guardarPersona(persona);
         return new ResponseEntity("Persona creada", HttpStatus.CREATED); //HttpStatus.OK
@@ -73,7 +74,7 @@ public class PersonaController {
     public ResponseEntity<?> obtenerPersonaPorId(@PathVariable("id") Long id){
 
         if (!this.personaService.existsPersonaById(id))
-            throw new NotFoundException("No existe la persona con id "+ id);
+            throw new NotFoundException("The person with id " + id + " does not exist.");
 
             PersonaModel persona = personaService.obtenerPersonaPorId(id).get();
             if (persona.equals("[]"))
@@ -82,27 +83,19 @@ public class PersonaController {
             return new ResponseEntity(persona, HttpStatus.OK);
 
     }
-/*
-    @DeleteMapping(value = "{patientId}")
-    public void deletePatientById(@PathVariable(value = "patientId") Long patientId) throws NotFoundException {
-        if (patientRecordRepository.findById(patientId).isEmpty()) {
-            throw new NotFoundException("Patient with ID " + patientId + " does not exist.");
-        }
-        patientRecordRepository.deleteById(patientId);
-    }
-    */
+
     @DeleteMapping(path = "/{id}")
     @ApiOperation(
             value = "Deletes the person corresponding to the id",
             notes = "Returns HTTP 404 if the person is not found")
-    public ResponseEntity<?> eliminarPorId(@PathVariable("id") Long id)  {
+    public ResponseEntity<?> eliminarPorId(@PathVariable("id")  Long id)  {
 
         if (!this.personaService.existsPersonaById(id))
-            throw new NotFoundException("No existe la persona con id "+ id);
+            throw new NotFoundException("The person with id " + id + " does not exist.");
 
         boolean ok = this.personaService.eliminarPersona(id);
 
-        if (!ok) throw new BadRequestException("No se eliminó persona con id " + id);
+        if (!ok) throw new BadRequestException("Person with id " + id +" was not deleted.");
 
         return new ResponseEntity("Persona eliminada", HttpStatus.OK);
 
@@ -121,39 +114,39 @@ public class PersonaController {
         }
 
         if (!this.personaService.existsPersonaById(id))
-            throw new NotFoundException("No existe la persona con id "+ id);
+            throw new NotFoundException("The person with id " + id + " does not exist.");
 
         if(personaService.existsByDni(persona.getDni()) && !this.personaService.findByDni(persona.getDni()).get().getId().equals(id))
-            throw new BadRequestException("Ya existe otra persona con ese DNI ");
+            throw new BadRequestException("There is already a person with DNI " + persona.getDni());
 
         boolean ok =  this.personaService.modificarPersona(id, persona);
 
         if (ok) {
-            return new ResponseEntity("Persona modificada", HttpStatus.OK);
+            return new ResponseEntity("Updated person. ", HttpStatus.OK);
         } else {
-            throw new BadRequestException("No se modificó persona con id " + id);
+            throw new BadRequestException("Person with id " + id + " not updated." );
         }
 
     }
 
     @PatchMapping("/{id}/{dni}")
     @ApiOperation(
-            value = "Modifies the document number  corresponding to the person id",
+            value = "Modifies the document number corresponding to the person id",
             notes = "Returns HTTP 404 if the person is not found and HTTP 400 If a person already exists with the document number")
     public ResponseEntity<?>  modificarPersonaParcial(@PathVariable Long id, @PathVariable String dni) {
 
         if (!this.personaService.existsPersonaById(id))
-            throw new NotFoundException("No existe la persona con id " + id);
+            throw new NotFoundException("The person with id " + id + " does not exist.");
 
         if(personaService.existsByDni(dni))
-            throw new BadRequestException("Ya existe una persona con ese DNI ");
+            throw new BadRequestException("There is already a person with DNI " + dni);
 
         boolean ok = personaService.modificarPersonaParcial(id, dni);
 
         if (ok) {
-            return new ResponseEntity("Persona modificada", HttpStatus.OK);
+            return new ResponseEntity("Updated person. ", HttpStatus.OK);
         } else {
-            throw new BadRequestException("No se modificó persona con id " + id);
+            throw new BadRequestException("Person with id " + id + " not updated." );
         }
     }
 }

@@ -40,5 +40,5 @@ public class PersonaModel {
     private String dni;
 
     @ApiModelProperty(notes = "isEmployed", required = true,  position = 5)
-    private boolean isEmployed;
+    private boolean esEmpleado;
 }
